@@ -108,8 +108,8 @@ def run():
 
     import os
     port = 9000
-    if os.environ['PORT'] != "":
-        port = os.environ['PORT']
+    if os.environ.get('PORT') is not None:
+        port = int(os.environ['PORT'])
 
     reactor.listenTCP(port, factory)
     reactor.run()
