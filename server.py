@@ -5,7 +5,7 @@ This implements a conformance server for ISO/IEC 23009-5 SAND.
 It validates the incoming SAND messages as well as the protocols used by
 a SAND client.
 
-Copyright (c) 2016-, ISO/IEC JTC1/SC29/WG11
+Copyright (c) 2017-, TNO
 All rights reserved.
 
 See AUTHORS for a full list of authors.
@@ -35,7 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from autobahn.twisted.websocket import WebSocketServerProtocol
 import logging
 
+from sand.xml_message import XMLValidator
+
 logging.basicConfig(filename='debug.log', level=logging.DEBUG, filemode='w')
+logging.basicConfig(filename='report.log', level=logging.INFO, filemode='w')
 
 class SandConformanceServer(WebSocketServerProtocol):
     """
@@ -50,15 +53,35 @@ class SandConformanceServer(WebSocketServerProtocol):
         logging.debug("WebSocket connection open.")
 
     def onMessage(self, payload, isBinary):
+        # Test 1 - Data frame type
         if isBinary:
             logging.debug(
                 "Binary message received: {0} bytes".format(len(payload)))
+            logging.error(
+                "[TEST][KO] Data frame type. Binary frame received, "
+                "text frame expected.")
+
         else:
             logging.debug(
                 "Text message received: {0}".format(payload.decode('utf8')))
+            logging.info(
+                "[TEST][OK] Data frame type. Text frame received.")
 
-        # echo back message verbatim
-        self.sendMessage(payload, isBinary)
+            # Test 2 - Message validation
+            try:
+                validator = XMLValidator()
+                if validator.from_string(request.data):
+                    logging.info("[TEST][OK] SAND message validation")
+                    success &= True
+                else:
+                    logging.info("[TEST][KO] SAND message validation")
+                    success = False
+            except:
+                logging.error("XML SAND message parsing")
+                success = False
+
+            # echo back message verbatim
+            self.sendMessage(payload, isBinary)
 
     def onClose(self, wasClean, code, reason):
         logging.info("WebSocket connection closed: {0}".format(reason))

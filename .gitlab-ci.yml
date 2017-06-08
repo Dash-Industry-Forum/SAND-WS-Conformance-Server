@@ -1,0 +1,22 @@
+before_script:
+  - apt-get update -qy
+  - apt-get install -qy locales
+  - echo "en_US UTF-8" > /etc/locale.gen
+  - locale-gen en_US.UTF-8
+  - export LANG=en_US.UTF-8
+  - export LANGUAGE=en_US:en
+  - export LC_ALL=en_US.UTF-8
+
+test:
+  script:
+  - apt-get install -y python-dev python-pip
+  - pip install -r requirements.txt
+  - python server.py &
+
+production:
+  type: deploy
+  script:
+  - apt-get update -qy
+  - apt-get install -y ruby-dev
+  - gem install dpl
+  - dpl --provider=heroku --app=sand-ws-conformance-server --api-key=$HEROKU_PRODUCTION_API_KEY
