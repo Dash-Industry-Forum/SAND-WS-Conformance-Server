@@ -53,6 +53,7 @@ class SandConformanceServer(WebSocketServerProtocol):
         logging.debug("WebSocket connection open.")
 
     def onMessage(self, payload, isBinary):
+        success = True
         # Test 1 - Data frame type
         if isBinary:
             logging.debug(
@@ -68,9 +69,10 @@ class SandConformanceServer(WebSocketServerProtocol):
                 "[TEST][OK] Data frame type. Text frame received.")
 
             # Test 2 - Message validation
+            message = payload.decode('utf8')
             try:
                 validator = XMLValidator()
-                if validator.from_string(request.data):
+                if validator.from_string(message):
                     logging.info("[TEST][OK] SAND message validation")
                     success &= True
                 else:
@@ -81,7 +83,12 @@ class SandConformanceServer(WebSocketServerProtocol):
                 success = False
 
             # echo back message verbatim
-            self.sendMessage(payload, isBinary)
+            if success:
+                response = "[RESULT][OK]"
+            else:
+                response = "[RESULT][KO]"
+
+            self.sendMessage(response, False)
 
     def onClose(self, wasClean, code, reason):
         logging.info("WebSocket connection closed: {0}".format(reason))
@@ -91,7 +98,6 @@ def run():
     Runs the server.
     """
     import sys
-
     from twisted.python import log
     from twisted.internet import reactor
     log.startLogging(sys.stdout)
@@ -100,7 +106,12 @@ def run():
     factory = WebSocketServerFactory()
     factory.protocol = SandConformanceServer
 
-    reactor.listenTCP(9000, factory)
+    import os
+    port = 9000
+    if os.environ['PORT'] != "":
+        port = os.environ['PORT']
+
+    reactor.listenTCP(port, factory)
     reactor.run()
 
 if __name__ == '__main__':
