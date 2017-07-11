@@ -70,16 +70,12 @@ class SandConformanceServer(WebSocketServerProtocol):
 
             # Test 2 - Message validation
             message = payload.decode('utf8')
-            try:
-                validator = XMLValidator()
-                if validator.from_string(message):
-                    logging.info("[TEST][OK] SAND message validation")
-                    success &= True
-                else:
-                    logging.info("[TEST][KO] SAND message validation")
-                    success = False
-            except:
-                logging.error("XML SAND message parsing")
+            validator = XMLValidator()
+            if validator.from_string(message):
+                logging.info("[TEST][OK] SAND message validation")
+                success &= True
+            else:
+                logging.info("[TEST][KO] SAND message validation")
                 success = False
 
             # echo back message verbatim
