@@ -10,15 +10,29 @@ before_script:
   - export LC_ALL=en_US.UTF-8
 
 test:
+  type: build
   script:
   - apt-get install -y python-dev python-pip
   - pip install -r requirements.txt
   - python server.py &
 
-production:
+staging:
   type: deploy
+  only:
+  - dev
   script:
-  - apt-get update -qy
+  - L=/usr/local/bin/flynn && curl -sSL -A "`uname -sp`" https://dl.flynn.io/cli | zcat >$L && chmod +x $L
+  - flynn cluster add -p $FLYNN_PIN_CERTIFICATE $FLYNN_CLUSTER_NAME $FLYNN_CONTROLLER_DOMAIN $FLYNN_CONTROLLER_KEY
+  - flynn create -y $CI_PROJECT_NAME || true
+  - git push flynn HEAD:master
+
+
+production:
+  image: ruby:latest
+  type: deploy
+  only:
+  - master
+  script:
   - apt-get install -y ruby-dev
   - gem install dpl
   - dpl --provider=heroku --app=sand-ws-conformance-server --api-key=$HEROKU_PRODUCTION_API_KEY
