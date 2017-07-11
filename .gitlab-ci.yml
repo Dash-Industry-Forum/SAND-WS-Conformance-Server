@@ -27,8 +27,10 @@ staging:
   script:
   - L=/usr/local/bin/flynn && curl -sSL -A "`uname -sp`" https://dl.flynn.io/cli | zcat >$L && chmod +x $L
   - flynn cluster add -p $FLYNN_CERTIFICATE_PIN $FLYNN_CLUSTER_NAME $FLYNN_CONTROLLER_DOMAIN $FLYNN_CONTROLLER_KEY
-  - flynn create -y $CI_PROJECT_NAME || true
-  - git push -f flynn HEAD:dev
+  - flynn create -y $CI_PROJECT_NAME --remote flynn || true
+  - git remote show
+  - git remote show flynn
+  - git push -f flynn flynn:dev
 
 
 production:
