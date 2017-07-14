@@ -32,6 +32,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+from string import replace
+
 from autobahn.twisted.websocket import WebSocketServerProtocol
 import logging
 
@@ -69,9 +71,10 @@ class SandConformanceServer(WebSocketServerProtocol):
                 "[TEST][OK] Data frame type. Text frame received.")
 
             # Test 2 - Message validation
-            message = payload.decode('utf8')
+            message = payload.decode('utf-8')
+            # TODO: Make it a regex
             validator = XMLValidator()
-            if validator.from_string(message):
+            if validator.from_string(message.encode('utf-8')):
                 logging.info("[TEST][OK] SAND message validation")
                 success &= True
             else:
