@@ -72,7 +72,6 @@ class SandConformanceServer(WebSocketServerProtocol):
 
             # Test 2 - Message validation
             message = payload.decode('utf-8')
-            # TODO: Make it a regex
             validator = XMLValidator()
             if validator.from_string(message.encode('utf-8')):
                 logging.info("[TEST][OK] SAND message validation")

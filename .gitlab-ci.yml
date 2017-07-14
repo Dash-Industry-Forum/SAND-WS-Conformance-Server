@@ -29,6 +29,7 @@ staging:
   - flynn cluster add -p $FLYNN_CERTIFICATE_PIN $FLYNN_CLUSTER_NAME $FLYNN_CONTROLLER_DOMAIN $FLYNN_CONTROLLER_KEY
   - flynn create -y $CI_PROJECT_NAME --remote flynn || true
   - git checkout dev
+  - git pull
   - git push -f flynn HEAD:master
 
 
