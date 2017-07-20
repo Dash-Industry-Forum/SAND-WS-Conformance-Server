@@ -32,7 +32,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-from string import replace
+import sys
 
 from autobahn.twisted.websocket import WebSocketServerProtocol
 import logging
@@ -41,6 +41,7 @@ from sand.xml_message import XMLValidator
 
 logging.basicConfig(filename='debug.log', level=logging.DEBUG, filemode='w')
 logging.basicConfig(filename='report.log', level=logging.INFO, filemode='w')
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, filemode='w')
 
 class SandConformanceServer(WebSocketServerProtocol):
     """
@@ -95,7 +96,6 @@ def run():
     """
     Runs the server.
     """
-    import sys
     from twisted.python import log
     from twisted.internet import reactor
     log.startLogging(sys.stdout)
