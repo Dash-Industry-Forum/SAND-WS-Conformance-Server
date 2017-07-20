@@ -39,9 +39,6 @@ import logging
 
 from sand.xml_message import XMLValidator
 
-logging.basicConfig(filename='debug.log', level=logging.DEBUG, filemode='w')
-logging.basicConfig(filename='report.log', level=logging.INFO, filemode='w')
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, filemode='w')
 
 class SandConformanceServer(WebSocketServerProtocol):
     """
@@ -98,6 +95,11 @@ def run():
     """
     from twisted.python import log
     from twisted.internet import reactor
+    file_handler = logging.FileHandler(filename='debug.log')
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    handlers = [file_handler, stdout_handler]
+
+    logging.basicConfig(handlers=handlers, level=logging.DEBUG)
     log.startLogging(sys.stdout)
 
     from autobahn.twisted.websocket import WebSocketServerFactory

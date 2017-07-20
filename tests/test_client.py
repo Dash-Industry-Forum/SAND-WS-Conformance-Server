@@ -64,6 +64,8 @@ class TestClientProtocol(WebSocketClientProtocol):
         with open(SAND_MESSAGE, "r") as sand_message:
             self.sendMessage(sand_message.read().encode('utf-8'))
 
+        self.sendClose()
+
 def run():
     """
     Run the WS client.
