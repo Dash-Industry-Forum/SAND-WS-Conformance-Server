@@ -1,1 +1,1 @@
-web: python server.py
+web: python sand_ws_server.py
